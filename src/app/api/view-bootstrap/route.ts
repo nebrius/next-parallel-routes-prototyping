@@ -2,10 +2,20 @@ import { ViewBootstrap } from "@/types/viewBootstrap";
 
 export const dynamic = 'force-dynamic' // defaults to auto
 
-const IS_MEMBER = true;
+let isMember = true;
+let flipViewTimeout: NodeJS.Timeout | undefined = undefined;
+function flipView() {
+  if (flipViewTimeout) {
+    return;
+  }
+  flipViewTimeout = setTimeout(() => {
+    isMember = !isMember;
+    flipViewTimeout = undefined;
+  }, 200)
+}
 
 export async function GET(request: Request) {
-  const data: ViewBootstrap = !IS_MEMBER ? {
+  const data: ViewBootstrap = !isMember ? {
     name: 'My Page',
     view: 'public',
     plegeCost: 5
@@ -14,5 +24,6 @@ export async function GET(request: Request) {
     view: 'member',
     memberSince: (new Date('2022/8/22')).getTime()
   }
+  flipView();
   return Response.json(data)
 }
